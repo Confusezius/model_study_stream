@@ -3,33 +3,38 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import requests
-import csv
 import os
+import s3fs
+import datetime
 
 #%%  
-st.set_page_config(layout="wide", page_title="Compare Generated Images")
+st.set_page_config(page_title="Compare Generated Images")
 
+#%%
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+local_css("style.css")
+            
 #%% 
 filename = 'sd_vs_bestseed.csv'
-if 'counter' not in st.session_state: 
+if 'counter' not in st.session_state:     
     st.session_state.counter = 0
     st.session_state.selections = []
     st.session_state.classes = []
     st.session_state.indices = []
     counter = 0
-    path_name = f'results_{filename.split(".")[0]}_{counter}.csv'
-    while os.path.exists(path_name):
-        counter += 1
-        path_name = f'results_{filename.split(".")[0]}_{counter}.csv'
-    
-    st.session_state.path_name = path_name
-    
-    with open(st.session_state.path_name, 'w') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Index', 'Method'])
+    timestr = str(datetime.datetime.now()).replace(' ', '_').replace(':', '-').replace('.', '-')
+    st.session_state.path_name = f'results_{timestr}.csv'
 
-col1, col2, col3, col4 = st.columns([3, 3, 3, 3], gap="medium")
 
+with st.sidebar:
+    st.markdown("<h3>Some info about yourself:</h3>", unsafe_allow_html=True)
+    gender = ["Prefer not to say", "Male", "Female", "Other"]
+    sel1 = st.selectbox("Your preferred gender", gender)
+    ages = ["Prefer not to say", "18-25", "26-35", "36-45", "45+"]
+    sel2 = st.selectbox("Age group", ages)
+    
 base_file = f'assets/{filename}'
 base_file = pd.read_csv(base_file)
 
@@ -48,43 +53,57 @@ def select_button(val, photo, prompt):
         import sys
         sys.exit()
 
-    with open(st.session_state.path_name, 'a') as file:
-        writer = csv.writer(file)
-        writer.writerow([st.session_state.counter, model])
-
+#AWS: eu-central-1    
 def end_everything():
+    gender_choice = sel1
+    age_choice = sel2
+
+    ### Write data to bucket.
+    df = pd.DataFrame({
+        'selections': st.session_state.selections,
+        'indices': st.session_state.indices,
+        'classes': st.session_state.classes,
+        'gender': [gender_choice for _ in range(len(st.session_state.selections))],
+        'age': [age_choice for _ in range(len(st.session_state.selections))]
+    })
+    
+    s3 = s3fs.S3FileSystem(anon=False)
+    with s3.open('studystorage/' + st.session_state.path_name, 'w') as f:
+        df.to_csv(f)
+
+    ### Complete everything.
     st.success("Finished! If you want to evaluate more images, just reload this page :).")
     import sys
     sys.exit()
-    
-#%%    
-# Get list of images in folder
-col1.subheader("Progress")
-progr = col1.progress(st.session_state.counter/len(image_1), text=f'Images seen: {st.session_state.counter}')
-sel_val = st.session_state.selections[np.clip(st.session_state.counter-3, 0, None): st.session_state.counter] if st.session_state.counter else []
-sel_val = ['Option ' + str(x) for x in sel_val]
-col1.write('**Last selections:**')
-col1.write('{0}'.format(' > '.join(sel_val)))
-
+   
 #%%     
 photo1 = image_1[st.session_state.counter]
 photo2 = image_2[st.session_state.counter]
 prompt = prompts[st.session_state.counter]
 prompt = requests.get(prompt).text
+ 
+#%%    
+# Get list of images in folder
+st.markdown("<h2 style='text-align: center;'>Task</h2>", unsafe_allow_html=True)
+st.markdown("<h5 style='text-align: center;'>Given a sentence, select which image closest reflects it. If the images are the same, choose one at random. If you are finished, please click [Done]!</h5>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center;'>Progress</h2>", unsafe_allow_html=True)
+progr = st.progress(st.session_state.counter/len(image_1), text=f'Images seen: {st.session_state.counter}')
+sel_val = st.session_state.selections[np.clip(st.session_state.counter-3, 0, None): st.session_state.counter] if st.session_state.counter else []
+sel_val = ['Option ' + str(x) for x in sel_val]
+st.markdown("<h2 style='text-align: center;'>Text Prompt</h2>", unsafe_allow_html=True)
+st.markdown(f"<h4 style='text-align: center; background-color: grey; color: white'>{prompt}</h4>", unsafe_allow_html=True)
+st.write('')
+st.write('')
+st.write('')
 
-col1.write('**Text Prompt:**')
-col1.write(prompt)
-col1.write('')
-col1.write('')
-col1.write('')
-btt1 = col1.button("**I'm done**", on_click=end_everything, key='btt1', type='primary')
-col2.image(photo1, caption='Option 1')
-btt2 = col2.button("I prefer this", on_click=select_button, args=[1, photo1, prompt], key='btt2')
-col3.image(photo2, caption='Option 2')
-col4.image('assets/question.png', caption='No preference')
-btt3 = col3.button("I prefer this", on_click=select_button, args=[2, photo2, prompt], key='btt3')
-btt4 = col4.button("No preference", on_click=select_button, args=[-1, 'Neither', prompt], key='btt4')
+col2, col3 = st.columns([3, 3], gap="medium")
 
+    
+col2.image(photo1, caption=None)
+btt2 = col2.button(":one: I prefer this", on_click=select_button, args=[1, photo1, prompt], key='btt2')
+col3.image(photo2, caption=None)
+btt3 = col3.button(":two: I prefer this", on_click=select_button, args=[2, photo2, prompt], key='btt3')
+btt1 = st.button("**I'm done**", on_click=end_everything, key='btt1', type='primary')
 
 
 
