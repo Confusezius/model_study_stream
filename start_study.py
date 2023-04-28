@@ -15,11 +15,12 @@ experiments = [
     # ['sd14_fixed', 'sd14_tifa'], 
     # ['sd14_tifa', 'sd14_imgreward'],
     # ['ae_14','struct_diff_14', 'comp_14', 'sd14_tifa'], #Comparison between baselines improvements and seed selection on SD14.
-    ['struct_diff_14', 'sd14_tifa'], #Comparison between baselines improvements and seed selection on SD14.
+    # ['struct_diff_14', 'sd14_tifa'], #Comparison between baselines improvements and seed selection on SD14.
     #SD21 Experiments
     # ['sd21_fixed', 'sd21_tifa'], 
-    ['ae_21', 'sd21_imgreward'], #Comparison A&E21 & TIFA Seed Selection.
-    ['ae_21', 'sd21_tifa'], #Comparison A&E21 & TIFA Seed Selection.
+    # ['ae_21', 'sd21_imgreward'], #Comparison A&E21 & TIFA Seed Selection.
+    # ['ae_21', 'sd21_tifa'], #Comparison A&E21 & TIFA Seed Selection.
+    ['ae_21', 'sd21_imgreward'] #Comparison A&E21 & TIFA Seed Selection.    
 ]
 
 img_files = [f'{i}.jpg' for i in range(1, 1001)]
