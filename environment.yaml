@@ -1,0 +1,10 @@
+name: visual_study
+channels:
+  - defaults
+dependencies:
+  - python=3.9.13
+  - pip:
+    - streamlit
+    - bs4
+    - pandas == 1.5.3
+    - -e .
