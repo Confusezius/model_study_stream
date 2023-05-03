@@ -86,7 +86,7 @@ with st.sidebar:
     st.markdown("<p>We are looking for <b>faithful</b> text representation. This means that correctly visualized semantic elements and relations are more important than simply the image quality.</p>", unsafe_allow_html=True)
     st.write('')
     st.markdown('<h3>Example: </h3><p><i>"A chicken on top of a house."</i></p>', unsafe_allow_html=True)
-    st.markdown("<p>Here, we should find a chicken and a house in the image. The chicken should also be on top, not e.g. next, to the house. An image of lower quality for which all of this holds is more faithful than a high-quality chicken image.</p>", unsafe_allow_html=True)    
+    st.markdown("<p>Here, we should find a chicken and a house in the image. The chicken should also be on top off, not e.g. next to, the house. An image of lower quality for which all of this holds is more faithful than a high-quality chicken image.</p>", unsafe_allow_html=True)    
 
 
 def select_button(val, photo, true_index):
@@ -136,7 +136,7 @@ photos = [image_dict[exp] for exp in exps]
 #%%    
 # Get list of images in folder
 st.markdown("<h2 style='text-align: center;'>Task</h2>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; font-size:20px'>Select which image most <b>faithfully</b> reflects the sentence. See left for more info. If the images are the same, choose one at random. If you are finished, please click <b>[Done]</b>!</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size:20px'>Select which image most <b>faithfully</b> reflects the sentence. See left for more info. If the images are the same, choose one at random. <b>Feel free to click through as many images as you want!</b> If you are finished, just click <b>[Done]</b>!</p>", unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;'>Progress</h2>", unsafe_allow_html=True)
 progr = st.progress(st.session_state.counter/st.session_state.num_prompts_per_call, text=f'Images seen: {st.session_state.counter} | {st.session_state.num_prompts_per_call}')
 sel_val = st.session_state.selections[np.clip(st.session_state.counter-3, 0, None): st.session_state.counter] if st.session_state.counter else []
