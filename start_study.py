@@ -12,21 +12,21 @@ import datetime
 base_path = 'https://shyamgopalawsbucket.s3.eu-north-1.amazonaws.com/diverse_1k'
 experiments = [
     #SD14 Experiments
-    ['ae_14', 'sd_14_tifa'], #Comparison A&E21 & TIFA Seed Selection.    
-    ['compose_14', 'sd_14_tifa'], #Comparison A&E21 & TIFA Seed Selection.    
-    ['struct_14', 'sd_14_tifa'], #Comparison A&E21 & TIFA Seed Selection.    
-    ['sd_14_fixed', 'sd_14_tifa'], #Comparison A&E21 & TIFA Seed Selection.    
-    ['ae_14', 'sd_14_imgreward'], #Comparison A&E21 & imgreward Seed Selection.    
-    ['compose_14', 'sd_14_imgreward'], #Comparison A&E21 & imgreward Seed Selection.    
-    ['struct_14', 'sd_14_imgreward'], #Comparison A&E21 & imgreward Seed Selection.    
-    ['sd_14_fixed', 'sd_14_imgreward'], #Comparison A&E21 & imgreward Seed Selection.    
+    ['ae_14', 'sd_14_tifa'], #Comparison A&E14 & TIFA Seed Selection.    
+    ['compose_14', 'sd_14_tifa'], #Comparison Comp14 & TIFA Seed Selection.    
+    ['struct_14', 'sd_14_tifa'], #Comparison Struct14 & TIFA Seed Selection.    
+    # ['sd_14_fixed', 'sd_14_tifa'], #Comparison SD-FixedSeed14 & TIFA Seed Selection.    
+    ['ae_14', 'sd_14_imgreward'], #Comparison A&E14 & imgreward Seed Selection.    
+    ['compose_14', 'sd_14_imgreward'], #Comparison Comp14 & imgreward Seed Selection.    
+    ['struct_14', 'sd_14_imgreward'], #Comparison Struct14 & imgreward Seed Selection.    
+    # ['sd_14_fixed', 'sd_14_imgreward'], #Comparison Fixed14 & imgreward Seed Selection.    
     ['sd_14_tifa', 'sd_14_imgreward'], #Comparison tifa & imgreward Seed Selection.    
     #SD21 Experiments
     ['ae_21', 'sd_21_tifa'], #Comparison A&E21 & TIFA Seed Selection.    
-    ['sd_21_fixed', 'sd_21_tifa'], #Comparison A&E21 & TIFA Seed Selection.    
+    # ['sd_21_fixed', 'sd_21_tifa'], #Comparison sdfixed_21 & TIFA Seed Selection.    
     ['ae_21', 'sd_21_imgreward'], #Comparison A&E21 & imgreward Seed Selection.    
-    ['sd_21_fixed', 'sd_21_imgreward'], #Comparison A&E21 & imgreward Seed Selection.    
-    ['sd_21_tifa', 'sd_21_imgreward'] #Comparison A&E21 & imgreward Seed Selection.    
+    # ['sd_21_fixed', 'sd_21_imgreward'], #Comparison sdfixed_21 & imgreward Seed Selection.    
+    ['sd_21_tifa', 'sd_21_imgreward'] #Comparison tifa 21 & imgreward 21 Seed Selection.    
 ]
 
 img_files = [f'{i}.jpg' for i in range(1, 1001)]
@@ -115,7 +115,8 @@ def end_everything():
         'age': [age_choice for _ in range(len(st.session_state.selections))],
         'first_time': [is_first_time for _ in range(len(st.session_state.selections))]
     })
-    
+
+    # Writes stuff into filesystem - uncomment if you have set up a resp. AWS bucket.    
     s3 = s3fs.S3FileSystem(anon=False)
     with s3.open('studystorage/' + st.session_state.path_name, 'w') as f:
         df.to_csv(f)
